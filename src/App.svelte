@@ -6,16 +6,25 @@
   let city = "";
   let weatherData = {};
   let savedCities = [];
+  let searchText = "Sök för att få en väderprognos";
+  const apiKey = "a41a7b3c0d9a2d86a27432474e50eb34";
+  const lang = "se";
+  const nodes = "9";
 
   const fetchQuotes = async () => {
-    const response = await fetch(
-      `https://api.openweathermap.org/data/2.5/forecast?q=${city},se&&lang=se&units=metric&cnt=9&APPID=a41a7b3c0d9a2d86a27432474e50eb34`
-    );
-    weatherData = await response.json();
-    if (!savedCities.includes(city)) {
-      let cityList = [];
-      cityList.push(city);
-      savedCities = savedCities.concat(cityList);
+    try {
+      const response = await fetch(
+        `https://api.openweathermap.org/data/2.5/forecast?q=${city},se&&lang=${lang}&units=metric&cnt=${nodes}&APPID=${apiKey}`
+      );
+      weatherData = await response.json();
+      if (!response.ok) throw weatherData.message;
+      if (!savedCities.includes(city)) {
+        let cityList = [];
+        cityList.push(city);
+        savedCities = savedCities.concat(cityList);
+      }
+    } catch (err) {
+      searchText = err;
     }
     city = "";
   };
@@ -68,6 +77,7 @@
     border: 0;
     background-color: transparent;
     padding: 0;
+    cursor: pointer;
   }
 </style>
 
@@ -100,7 +110,7 @@
           description={day.weather[0].description} />
       {/each}
     {:else}
-      <p>Sök för att få en väderprognos</p>
+      <p>{searchText}</p>
     {/if}
 
   </section>
